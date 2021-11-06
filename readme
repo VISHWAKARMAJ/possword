@@ -1,0 +1,168 @@
+console.clear();
+
+
+const sliderProps = {
+    fill: "#0B1EDF",
+    background: "rgba(255, 255, 255, 0.214)",
+
+};
+const slider = document.querySelector(".range__slider");
+const sliderValue = document.querySelector(".length__title");
+
+slider.querySelector('input').addEventListener("input", event => {
+    sliderValue.setAttribute("date-length", event.target.value);
+    applyFill(event.target);
+});
+
+applyFill(slider.querySelector("input"));
+
+
+function applyFill(slider) {
+    const percentage = (100 * (slider.value - slider.min)) / (slider.max - slider.min);
+    const bg = `linear-gradient(90deg, ${sliderProps.fill} ${percentage}%,
+        ${sliderProps.background} ${percentage + 0.1}%)`;
+    slider.style.background = bg;
+    sliderValue.setAttribute("data-length", slider.value);
+}
+const randomFunc = {
+    lower: getRandomLower,
+    upper: getRandomUpper,
+    number: getRandomNumber,
+    symbol: getRandomSymbol,
+};
+
+function secureMathRandom() {
+    return window.crypto.getRandomValues(new Uint32Array(1))[0] / (Math.pow(2, 32) - 1);
+}
+
+function getRandomLower() {
+    return String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+};
+
+function getRandomUpper() {
+    return String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+}
+
+function getRandomNumber() {
+    return String.fromCharCode(Math.floor(secureMathRandom() * 10) + 48);
+}
+
+function getRandomSymbol() {
+    const Symbols = '`~!@#$%^&*()_+{}|: "<>?,./][\_=';
+    return sysmbols[Math.floor(Math.random() * symnbols.length)];
+}
+const resultE1 = document.getElementById('result');
+const lengthE1 = document.getElementById('slider');
+
+const uppercaseE1 = document.getElementById('uppercase');
+const lowercaseE1 = document.getElementById('lowercase');
+
+const numberE1 = document.getElementById('numberE1');
+const symbolE1 = document.getElementById("symbolE1");
+
+const generateBtn = document.getElementById('generate');
+
+const copyBtn = document.getElementById("copy-btn");
+const resultContainer = document.querySelector('.result');
+
+const copyInfo = document.querySelector(".result__info.right");
+const copiedInfo = document.querySelector(".result__info.left");
+
+let generatedPassword = false;
+
+let generatedPassword = {
+    left: resultContainer.getBoundingClientRect().left,
+    top: resultContainer.getBoundingClientRect().top,
+};
+
+resultContainer.addEventListener('mousemove', e => {
+    resultContainerBound = {
+        left: resultContainer.getBoundingClientRect().left,
+        top: resultContainer.getBoundingClientRect().top,
+    };
+    if (generatedPassword) {
+        copyBtn.style.opacity = '1';
+        copyBtn.style.pointerEvents = 'all';
+        copyBtn.style.setProperty('--x', `${e.x-resultContainerBound.left}px`);
+        copyBtn.style.setProperty('--y', `${e.y-resultContainerBound.top}px`);
+    } else {
+        copyBtn.style.opacity = '0';
+        copyBtn.style.pointerEvents = 'none';
+    }
+});
+window.addEventListener('resize', e => {
+    resultContainerBound = {
+        left: resultContainer.getBoundingClientRect().left,
+        top: resultContainer.getBoundingClientRect().top,
+    };
+})
+
+copyBtn.addEventListener('click', () => {
+    const textarea = document.createElement('texterea');
+    const password = resultE1.innerText;
+    if (!password || password == "CLICK GENERATE") {
+        return;
+    }
+
+    textarea.value = password;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+
+    copyInfo.style.transform = "translatey(200%)";
+    copyInfo.style.opacity = "0";
+
+    copiedInfo.style.transform = "transletey(0%)";
+    copiedInfo.style.opacity = "0.75";
+});
+
+generateBtn.addEventListener("click", () => {
+    const length = +lengthE1.value;
+    const hasLower = lowercaseE1.Checked;
+    const hasUpper = uppercaseE1.Checked;
+    const hasNumber = numberE1.Checked;
+    const hasSymbol = symbolE1.Checked;
+    generatedPassword = true;
+    resultE1.innerText = generatedPassword(length, hasLower, hasUpper, hasNumber, hasSymbol);
+
+
+    copyInfo.style.transform = 'translatey(0%)';
+    copyInfo.style.opacity = '0.75';
+    copiedInfo.style.transform = "translatey(200%)";
+    copiedInfo.style.opacity = "0";
+});
+
+function generatedPassword(length, lower, upper, number, symbol) {
+    let generatedPassword = '';
+    const typeCount = lower + upper + number + symbol;
+    const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(item =>
+        Object.values(itme)[0]);
+    if (typeCount === 0) {
+        return '';
+    }
+    for (let i = 0; i < length; i++) {
+        typesArr.forEach(type => {
+            const funcName = Object.kays(type)[0];
+            generatedPassword += randomFunc[funcName]();
+        });
+    }
+    return generatedPassword.slice(0, length);
+}
+
+function disableOnlyCheckebox() {
+    let totalChecked = [uppercaseE1, lowercaseE1, numberE1, symbolE1].filter(el => el.checked)
+    totalChecked.forEach(el => {
+        if (totalChecked.length == 1) {
+            el.disabled = true;
+        } else {
+            el.disabled = false;
+        }
+    })
+}
+
+[uppercaseE1, lowercaseE1, numberE1, symbolE1].forEach(el => {
+    el.addEventListener('click', () => {
+        disableOncheckebox()
+    })
+})
